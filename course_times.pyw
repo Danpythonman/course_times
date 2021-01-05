@@ -1,4 +1,3 @@
-import shelve
 import os
 import PySimpleGUI as sg
 import time
@@ -41,12 +40,6 @@ def export_window():
                         "PHYS1800"]
 
     current_times = []
-    with shelve.open("course_times.db") as db:
-        # temp = db[""]
-        # temp += 0
-        # db[""] = temp
-        for course in current_courses:
-            current_times.append(db[course])
 
     layout = []
 
@@ -77,17 +70,7 @@ def main():
 
     current_day = str(date.today())
 
-    with shelve.open("course_times.db") as db:
-        # Check if current weekday is Monday
-        if datetime.today().weekday() == 0:
-            # Check if the data has already been reset today
-            if db["last_reset"] != current_day:
-                # The data has not been reset yet, so we set all the values of
-                # the courses to 0
-                for course in current_courses:
-                    db[course] = 0
-
-                db["last_reset"] = current_day
+    # ----- Reset data for the week
 
     # 0 means a start time has not been recorded, so clicking the "Time"
     # button will start timing
@@ -132,10 +115,7 @@ def main():
 
                 window["elapsed_time"].update(elapsed_time)
 
-                with shelve.open("course_times.db") as db:
-                    previous_time = db[values["course_selected"]]
-                    new_time = previous_time + elapsed_time
-                    db[values["course_selected"]] = new_time
+                # ----- Add times to database
 
                 # Reset stopwatch variable so it is ready to start timing again
                 stopwatch_controller = 0
@@ -143,10 +123,9 @@ def main():
         elif event == "entry":
             entered_time = sg.popup_get_text("Enter the time you want to add or subtract")
 
-            with shelve.open("course_times.db") as db:
-                previous_time = db[values["course_selected"]]
-                new_time = previous_time + int(entered_time)
-                db[values["course_selected"]] = new_time
+            # ----- Add this time to the database
+            previous_time = db[values["course_selected"]]
+            new_time = previous_time + int(entered_time)
 
         elif event == "export":
             export_window()
