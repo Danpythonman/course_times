@@ -1,6 +1,6 @@
 import os
-import PySimpleGUI as sg
 import time
+import PySimpleGUI as sg
 from datetime import datetime, date
 
 
@@ -65,8 +65,15 @@ def main():
 
     os.chdir("C:\\Users\\Daniel\\Documents\\Programming\\time_management")
 
-    current_courses = ["EECS 1011", "ENG 1101", "MATH 1013", "MATH 1025",
-                        "PHYS1800"]
+    # Check if the folder for the JSON files exists already, if not then
+    # create it
+    if "json_data" in os.listdir():
+        # Check if the folder for the JSON files is empty and if it is, add the
+        # first JSON file
+        if os.listdir("json_data") == []:
+            pass
+    else:
+        os.mkdir("json_data")
 
     current_day = str(date.today())
 
@@ -124,7 +131,7 @@ def main():
             entered_time = sg.popup_get_text("Enter the time you want to add or subtract")
 
             # ----- Add this time to the database
-            previous_time = db[values["course_selected"]]
+            previous_time = values["course_selected"]
             new_time = previous_time + int(entered_time)
 
         elif event == "export":
