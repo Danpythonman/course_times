@@ -1,7 +1,46 @@
 import os
 import time
+from datetime import datetime, date, timedelta
+import json
 import PySimpleGUI as sg
-from datetime import datetime, date
+
+
+def create_json_filename(current_date):
+    """
+    Creates the name for the current week's JSON file.
+    The name will be start date to end date in this format:
+    YYYY-MM-DD--YYYY-MM-DD
+    """
+
+    # -- IMPORTANT --
+    # In the datetime module, Monday is 0, Tuseday is 1, ..., Sunday is 6
+
+    # Initialize varaible to hold date object for start date and a counter for
+    # the number of days to get to the last Sunday
+    start_date = None
+    subtract_days = 0
+    # Stop when the start date variable gets filled
+    while not start_date:
+        subtracted_date = current_date - timedelta(subtract_days)
+        # Day 6 is Sunday
+        if subtracted_date.weekday() == 6:
+            start_date = subtracted_date
+        subtract_days += 1
+
+    # Initialize varaible to hold date object for end date and a counter for
+    # the number of days to get to the next Saturday
+    end_date = None
+    add_days = 0
+    # Stop when the end date variable gets filled
+    while not end_date:
+        added_date = current_date + timedelta(add_days)
+        # Day 5 is Saturday
+        if added_date.weekday() == 5:
+            end_date = added_date
+        add_days += 1
+
+    # Return the file name without the ".json"
+    return start_date.strftime("%y-%m-%d") + "--" + end_date.strftime("%y-%m-%d")
 
 
 def calculate_elapsed_time(time_1, time_2):
@@ -65,19 +104,25 @@ def main():
 
     os.chdir("C:\\Users\\Daniel\\Documents\\Programming\\time_management")
 
+    current_day = date.today()
+
+    current_week_filename = create_json_filename(current_day) + ".json"
+
     # Check if the folder for the JSON files exists already, if not then
     # create it
     if "json_data" in os.listdir():
         # Check if the folder for the JSON files is empty and if it is, add the
         # first JSON file
         if os.listdir("json_data") == []:
-            pass
+            with open("json_data\\" + current_week_filename, "w") as json_file:
+                pass
     else:
         os.mkdir("json_data")
 
-    current_day = str(date.today())
-
-    # ----- Reset data for the week
+    # If the current week's JSON file does not yet exist, create it
+    if current_week_filename not in os.listdir("json_data"):
+        with open("json_data\\" + current_week_filename, "w") as json_file:
+            pass
 
     # 0 means a start time has not been recorded, so clicking the "Time"
     # button will start timing
@@ -85,7 +130,7 @@ def main():
     # will stop timing
     stopwatch_controller = 0
 
-    layout = [[sg.Combo(current_courses, key="course_selected"), sg.Button("Time", key="time"), sg.Button("Entry", key="entry")],
+    layout = [[sg.Combo(["PHYS 1800"], key="course_selected", default_value="PHYS 1800"), sg.Button("Time", key="time"), sg.Button("Entry", key="entry")],
               [sg.Text("Start time: "), sg.Text("00:00", key="start_time")],
               [sg.Text("End time: "), sg.Text("00:00", key="end_time")],
               [sg.Text("Elapsed Minutes: "), sg.Text("000", key="elapsed_time")],
@@ -122,17 +167,27 @@ def main():
 
                 window["elapsed_time"].update(elapsed_time)
 
-                # ----- Add times to database
+                with open("json_data\\" + current_week_filename) as json_file:
+                    course_times = json.load(json_file)
+
+                course_times[values["course_selected"]] += elapsed_time
+
+                with open("json_data\\" + current_week_filename, "w") as json_file:
+                    json_file.write(json.dumps(course_times, indent=4))
 
                 # Reset stopwatch variable so it is ready to start timing again
                 stopwatch_controller = 0
 
         elif event == "entry":
-            entered_time = sg.popup_get_text("Enter the time you want to add or subtract")
+            entered_time = int(sg.popup_get_text("Enter the time you want to add or subtract"))
 
-            # ----- Add this time to the database
-            previous_time = values["course_selected"]
-            new_time = previous_time + int(entered_time)
+            with open("json_data\\" + current_week_filename) as json_file:
+                course_times = json.load(json_file)
+
+            course_times[values["course_selected"]] += entered_time
+
+            with open("json_data\\" + current_week_filename, "w") as json_file:
+                json_file.write(json.dumps(course_times, indent=4))
 
         elif event == "export":
             export_window()
