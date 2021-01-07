@@ -106,23 +106,36 @@ def main():
 
     current_day = date.today()
 
-    current_week_filename = create_json_filename(current_day) + ".json"
-
     # Check if the folder for the JSON files exists already, if not then
     # create it
-    if "json_data" in os.listdir():
-        # Check if the folder for the JSON files is empty and if it is, add the
-        # first JSON file
-        if os.listdir("json_data") == []:
-            with open("json_data\\" + current_week_filename, "w") as json_file:
-                pass
-    else:
+    if "json_data" not in os.listdir():
         os.mkdir("json_data")
+
+        # Make folder to hold preferences
+        os.mkdir("json_data/preferences")
+
+        # Make preferences file (it is a JSON file)
+        with open("json_data/preferences/preferences.json", "w") as preferences_json_file:
+            preferences_json_file.write(json.dumps({"current_semester": "No semster chosen"}, indent=4))
+
+    with open("json_data/preferences/preferences.json") as preferences_json_file:
+        preferences_data = json.load(preferences_json_file)
+
+        # This is a list of strings that are the names of the current courses
+        current_courses = preferences_data["current_courses"]
+
+        # This is a string that is the name of the current semester
+        current_semester = preferences_data["current_semester"]
+    current_week_filename = current_semester + "/" + create_json_filename(current_day) + ".json"
 
     # If the current week's JSON file does not yet exist, create it
     if current_week_filename not in os.listdir("json_data"):
+        course_times = {}
         with open("json_data\\" + current_week_filename, "w") as json_file:
-            pass
+            # Initialize the dictionary for the file
+            for course in current_courses:
+                course_times[course] = 0
+            json_file.write(json.dumps(course_times, indent=4))
 
     # 0 means a start time has not been recorded, so clicking the "Time"
     # button will start timing
@@ -130,13 +143,14 @@ def main():
     # will stop timing
     stopwatch_controller = 0
 
-    layout = [[sg.Combo(["PHYS 1800"], key="course_selected", default_value="PHYS 1800"), sg.Button("Time", key="time"), sg.Button("Entry", key="entry")],
+    layout = [[sg.Text("Current Semester: " + current_semester), sg.Button("Settings", key="settings")],
+              [sg.Combo(current_courses, key="course_selected", default_value="PHYS 1800"), sg.Button("Time", key="time"), sg.Button("Entry", key="entry")],
               [sg.Text("Start time: "), sg.Text("00:00", key="start_time")],
               [sg.Text("End time: "), sg.Text("00:00", key="end_time")],
               [sg.Text("Elapsed Minutes: "), sg.Text("000", key="elapsed_time")],
               [sg.Button("Check Times for this Week", key="export")]]
 
-    window = sg.Window("Window 1", layout)
+    window = sg.Window("Course Times", layout)
 
     # --- Main event loop ---
     while True:
