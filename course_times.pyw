@@ -72,33 +72,6 @@ def calculate_elapsed_time(time_1, time_2):
     return minutes
 
 
-def export_window():
-    """Creates a new window for showing current times for each course"""
-
-    current_courses = ["EECS 1011", "ENG 1101", "MATH 1013", "MATH 1025",
-                        "PHYS1800"]
-
-    current_times = []
-
-    layout = []
-
-    i = 0
-    for course in current_courses:
-        layout.append([sg.Text(course), sg.Text(str(current_times[i]))])
-        i += 1
-
-    layout.append([sg.Button("Close", key="close")])
-
-    window = sg.Window("Window 1", layout, size=(200, 200), element_justification="c")
-
-    while True:
-        event, values = window.read()
-        if event == None or event == "close":
-            break
-
-    window.close()
-
-
 def main():
     """Main controlling function"""
 
@@ -144,7 +117,7 @@ def main():
     stopwatch_controller = 0
 
     layout = [[sg.Text("Current Semester: " + current_semester)],
-              [sg.Combo(current_courses, key="course_selected", default_value="PHYS 1800"), sg.Button("Time", key="time"), sg.Button("Entry", key="entry")],
+              [sg.Combo(current_courses, key="course_selected"), sg.Button("Time", key="time"), sg.Button("Entry", key="entry")],
               [sg.Text("Start time: "), sg.Text("00:00", key="start_time")],
               [sg.Text("End time: "), sg.Text("00:00", key="end_time")],
               [sg.Text("Elapsed Minutes: "), sg.Text("000", key="elapsed_time")],
@@ -204,7 +177,8 @@ def main():
                 json_file.write(json.dumps(course_times, indent=4))
 
         elif event == "export":
-            export_window()
+            import course_times_output
+            course_times_output.export_window(current_week_filename)
 
     window.close()
 
