@@ -143,7 +143,7 @@ def main():
     # will stop timing
     stopwatch_controller = 0
 
-    layout = [[sg.Text("Current Semester: " + current_semester), sg.Button("Settings", key="settings")],
+    layout = [[sg.Text("Current Semester: " + current_semester)],
               [sg.Combo(current_courses, key="course_selected", default_value="PHYS 1800"), sg.Button("Time", key="time"), sg.Button("Entry", key="entry")],
               [sg.Text("Start time: "), sg.Text("00:00", key="start_time")],
               [sg.Text("End time: "), sg.Text("00:00", key="end_time")],
