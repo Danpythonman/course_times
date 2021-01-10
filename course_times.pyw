@@ -22,8 +22,8 @@ def create_json_filename(current_date):
     # Stop when the start date variable gets filled
     while not start_date:
         subtracted_date = current_date - timedelta(subtract_days)
-        # Day 6 is Sunday
-        if subtracted_date.weekday() == 6:
+        # Day 0 is Monday
+        if subtracted_date.weekday() == 0:
             start_date = subtracted_date
         subtract_days += 1
 
@@ -34,8 +34,8 @@ def create_json_filename(current_date):
     # Stop when the end date variable gets filled
     while not end_date:
         added_date = current_date + timedelta(add_days)
-        # Day 5 is Saturday
-        if added_date.weekday() == 5:
+        # Day 6 is Sunday
+        if added_date.weekday() == 6:
             end_date = added_date
         add_days += 1
 
@@ -89,7 +89,7 @@ def main():
 
         # Make preferences file (it is a JSON file)
         with open("json_data/preferences/preferences.json", "w") as preferences_json_file:
-            preferences_json_file.write(json.dumps({"current_semester": "No semster chosen"}, indent=4))
+            preferences_json_file.write(json.dumps({"current_semester": "No semster chosen", "current_courses": "No courses"}, indent=4))
 
     with open("json_data/preferences/preferences.json") as preferences_json_file:
         preferences_data = json.load(preferences_json_file)
