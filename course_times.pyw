@@ -110,6 +110,26 @@ def main():
                 course_times[course] = 0
             json_file.write(json.dumps(course_times, indent=4))
 
+    if "daily_times.json" not in os.listdir("json_data"):
+        daily_times = {}
+        with open("json_data\\" + "daily_times.json", "w") as json_file:
+            # Initialize the dictionary for the file
+            daily_times["date"] = str(current_day)
+            for course in current_courses:
+                daily_times[course] = 0
+            json_file.write(json.dumps(daily_times, indent=4))
+    else:
+        with open("json_data\\" + "daily_times.json") as json_file:
+            daily_times = json.load(json_file)
+        if daily_times["date"] != current_day:
+            daily_times = {}
+            with open("json_data\\" + "daily_times.json", "w") as json_file:
+                # Initialize the dictionary for the file
+                daily_times["date"] = str(current_day)
+                for course in current_courses:
+                    daily_times[course] = 0
+                json_file.write(json.dumps(daily_times, indent=4))
+
     # 0 means a start time has not been recorded, so clicking the "Time"
     # button will start timing
     # 1 means a start time has been recorded, so clicking the "Time" button
