@@ -102,7 +102,7 @@ def main():
     current_week_filename = current_semester + "/" + create_json_filename(current_day) + ".json"
 
     # If the current week's JSON file does not yet exist, create it
-    if current_week_filename not in os.listdir("json_data"):
+    if create_json_filename(current_day) + ".json" not in os.listdir("json_data/" + current_semester):
         course_times = {}
         with open("json_data\\" + current_week_filename, "w") as json_file:
             # Initialize the dictionary for the file
