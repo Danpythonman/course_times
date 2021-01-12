@@ -174,6 +174,7 @@ def main():
 
                 window["elapsed_time"].update(elapsed_time)
 
+                # Update course times
                 with open("json_data\\" + current_week_filename) as json_file:
                     course_times = json.load(json_file)
 
@@ -182,12 +183,22 @@ def main():
                 with open("json_data\\" + current_week_filename, "w") as json_file:
                     json_file.write(json.dumps(course_times, indent=4))
 
+                # Update daily times
+                with open("json_data\\" + "daily_times.json") as json_file:
+                    daily_times = json.load(json_file)
+
+                daily_times[values["course_selected"]] += elapsed_time
+
+                with open("json_data\\" + "daily_times.json", "w") as json_file:
+                    json_file.write(json.dumps(daily_times, indent=4))
+
                 # Reset stopwatch variable so it is ready to start timing again
                 stopwatch_controller = 0
 
         elif event == "entry":
             entered_time = int(sg.popup_get_text("Enter the time you want to add or subtract"))
 
+            # Update course times
             with open("json_data\\" + current_week_filename) as json_file:
                 course_times = json.load(json_file)
 
@@ -195,6 +206,15 @@ def main():
 
             with open("json_data\\" + current_week_filename, "w") as json_file:
                 json_file.write(json.dumps(course_times, indent=4))
+
+            # Update daily times
+            with open("json_data\\" + "daily_times.json") as json_file:
+                daily_times = json.load(json_file)
+
+            daily_times[values["course_selected"]] += entered_time
+
+            with open("json_data\\" + "daily_times.json", "w") as json_file:
+                json_file.write(json.dumps(daily_times, indent=4))
 
         elif event == "export":
             import course_times_output
