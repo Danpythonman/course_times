@@ -121,7 +121,7 @@ def main():
     else:
         with open("json_data\\" + "daily_times.json") as json_file:
             daily_times = json.load(json_file)
-        if daily_times["date"] != current_day:
+        if daily_times["date"] != str(current_day):
             daily_times = {}
             with open("json_data\\" + "daily_times.json", "w") as json_file:
                 # Initialize the dictionary for the file
