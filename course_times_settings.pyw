@@ -31,6 +31,7 @@ def main():
         [sg.Text("Choose Semester:"), sg.Combo(semesters, key="semester_selected"), sg.Button("Choose", key="choose_semester")],
         [sg.Text("Add New Semester:"), sg.Input(key="new_semester_name"), sg.Button("Add", key="add_semester")],
         [sg.Text("Add"), sg.Input(key="number_of_courses", size=(2,1)), sg.Text("new courses"), sg.Button("Go", key="add_courses")],
+        [sg.Text("View Data of Selected Semester"), sg.Button("View", key="data")]
     ]
 
     window = sg.Window("Choose Semester", layout)
@@ -83,6 +84,10 @@ def main():
                     preferences_json_file.write(json.dumps(course_times_settings, indent=4))
             else:
                 sg.popup("Enter a number")
+
+        elif event == "data":
+            from course_times_graphs import graphWindow
+            graphWindow(values["semester_selected"])
 
 
 if __name__ == "__main__":
